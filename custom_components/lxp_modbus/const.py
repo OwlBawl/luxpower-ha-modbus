@@ -40,7 +40,7 @@ CONF_REGISTER_BLOCK_SIZE = "register_block_size"
 CONF_CONNECTION_RETRIES = "connection_retries"
 CONF_ENABLE_DEVICE_GROUPING = "enable_device_grouping"
 
-INTEGRATION_TITLE = "LuxPower Inverter (Modbus)"
+INTEGRATION_TITLE = "Luxpower Modbus-to-USB"
 
 
 DEFAULT_POLL_INTERVAL = 60  # or whatever default you prefer, in seconds
