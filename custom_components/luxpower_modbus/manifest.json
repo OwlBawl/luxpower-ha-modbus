@@ -1,12 +1,12 @@
 {
-  "domain": "lxp_modbus",
+  "domain": "luxpower_modbus",
   "name": "Luxpower Modbus-to-USB",
-  "codeowners": ["@ant0nkr"],
+  "codeowners": ["@OwlBawl"],
   "config_flow": true,
-  "documentation": "https://github.com/ant0nkr/luxpower-ha-integration",
+  "documentation": "https://github.com/OwlBawl/luxpower-ha-modbus",
   "integration_type": "hub",
   "iot_class": "local_polling",
-  "issue_tracker": "https://github.com/ant0nkr/luxpower-ha-integration/issues",
+  "issue_tracker": "https://github.com/OwlBawl/luxpower-ha-modbus/issues",
   "requirements": ["voluptuous", "pymodbus==3.5.4"],
-  "version": "0.2.2"
+  "version": "0.3.4"
 }

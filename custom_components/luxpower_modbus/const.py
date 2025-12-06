@@ -1,7 +1,7 @@
 from typing import Final
 from homeassistant.const import Platform
 
-DOMAIN = "lxp_modbus"
+DOMAIN = "luxpower_modbus"
 
 PLATFORMS: Final = [
     Platform.SENSOR,
