@@ -189,26 +189,27 @@ class LxpModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors[CONF_CONNECTION_RETRIES] = "invalid_connection_retries"
             
             if not errors:
-                model = await get_inverter_model_from_device_rtu(
-                    user_input[CONF_SERIAL_PORT],
-                    user_input[CONF_BAUDRATE],
-                    user_input[CONF_PARITY],
-                    user_input[CONF_STOPBITS],
-                    user_input[CONF_BYTESIZE],
-                    user_input[CONF_SLAVE_ID]
-                )
-                if not model:
-                    errors["base"] = "model_fetch_failed_rtu"
-                else:
-                    user_input[CONF_PROTOCOL] = PROTOCOL_RTU
-                    user_input["model"] = model
-                    user_input[CONF_DONGLE_SERIAL] = "RTU_DEVICE"
-                    user_input[CONF_INVERTER_SERIAL] = f"RTU_{user_input[CONF_SLAVE_ID]:010d}"
-                    title = user_input.get(CONF_ENTITY_PREFIX) or "Luxpower Inverter RTU"
-                    return self.async_create_entry(title=title, data=user_input)
-            except Exception as e:
-                _LOGGER.error(f"RTU configuration error: {e}")
-                errors["base"] = "unknown"
+                try:
+                    model = await get_inverter_model_from_device_rtu(
+                        user_input[CONF_SERIAL_PORT],
+                        user_input[CONF_BAUDRATE],
+                        user_input[CONF_PARITY],
+                        user_input[CONF_STOPBITS],
+                        user_input[CONF_BYTESIZE],
+                        user_input[CONF_SLAVE_ID]
+                    )
+                    if not model:
+                        errors["base"] = "model_fetch_failed_rtu"
+                    else:
+                        user_input[CONF_PROTOCOL] = PROTOCOL_RTU
+                        user_input["model"] = model
+                        user_input[CONF_DONGLE_SERIAL] = "RTU_DEVICE"
+                        user_input[CONF_INVERTER_SERIAL] = f"RTU_{user_input[CONF_SLAVE_ID]:010d}"
+                        title = user_input.get(CONF_ENTITY_PREFIX) or "Luxpower Inverter RTU"
+                        return self.async_create_entry(title=title, data=user_input)
+                except Exception as e:
+                    _LOGGER.error(f"RTU configuration error: {e}")
+                    errors["base"] = "unknown"
         
         # Get available serial ports
         serial_ports = get_serial_ports()
@@ -255,16 +256,25 @@ class LxpModbusOptionsFlow(config_entries.OptionsFlow):
                 if not errors:
                     # Validate based on protocol
                     if protocol == PROTOCOL_TCP:
-                        validate_serial(user_input[CONF_DONGLE_SERIAL])
-                        validate_serial(user_input[CONF_INVERTER_SERIAL])
-                        model = await get_inverter_model_from_device_tcp(
-                            user_input[CONF_HOST],
-                            user_input[CONF_PORT],
-                            user_input[CONF_DONGLE_SERIAL],
-                            user_input[CONF_INVERTER_SERIAL]
-                        )
-                        if not model:
-                            errors["base"] = "model_fetch_failed"
+                        try:
+                            validate_serial(user_input[CONF_DONGLE_SERIAL])
+                        except vol.Invalid:
+                            errors[CONF_DONGLE_SERIAL] = "invalid_serial"
+                        
+                        try:
+                            validate_serial(user_input[CONF_INVERTER_SERIAL])
+                        except vol.Invalid:
+                            errors[CONF_INVERTER_SERIAL] = "invalid_serial"
+                        
+                        if not errors:
+                            model = await get_inverter_model_from_device_tcp(
+                                user_input[CONF_HOST],
+                                user_input[CONF_PORT],
+                                user_input[CONF_DONGLE_SERIAL],
+                                user_input[CONF_INVERTER_SERIAL]
+                            )
+                            if not model:
+                                errors["base"] = "model_fetch_failed"
                     else:  # RTU
                         model = await get_inverter_model_from_device_rtu(
                             user_input[CONF_SERIAL_PORT],
